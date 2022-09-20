@@ -1,0 +1,240 @@
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class Session1 {
+
+	public static void main(String[] args) throws SQLException {
+		// hsqldbEx1();
+		// oracleEx1();
+		// hsqldbEx2();
+		hsqldbEx3a();
+		oracleEx3a();
+	}
+
+	public static void hsqldbEx1() throws SQLException {
+		System.out.println(
+				"---------------------HSDQLDB exercise 1----------------------");
+		Connection c = null;
+		String user = "sa";
+		String pass = "";
+		ResultSet r = null;
+		int i = 0;
+		Statement s = null;
+		try {
+			long t1 = System.currentTimeMillis();
+			c = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost",
+					user, pass);
+			s = c.createStatement();
+			for (i = 0; i < 1000; i++)
+				r = s.executeQuery(
+						"update tinvoices set amount = amount + 1 where id = "
+								+ i);
+			long t2 = System.currentTimeMillis();
+			System.out.println("TIME FOR STATEMENT IS: " + (t2 - t1));
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (r != null)
+				r.close();
+			if (s != null)
+				s.close();
+			c.close();
+		}
+		PreparedStatement p = null;
+		try {
+			long t1 = System.currentTimeMillis();
+			c = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost",
+					user, pass);
+			p = c.prepareStatement(
+					"update tinvoices set amount = amount + 1 where id = ?");
+
+			p.setInt(1, i);
+			for (i = 0; i < 1000; i++)
+				p.executeUpdate();
+			long t2 = System.currentTimeMillis();
+			System.out.println("TIME FOR PREPARED STATEMENT IS: " + (t2 - t1));
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (r != null)
+				r.close();
+			if (p != null)
+				p.close();
+			c.close();
+		}
+	}
+
+	public static void oracleEx1() throws SQLException {
+		System.out.println(
+				"---------------------Oracle exercise 1-----------------------");
+		Connection c = null;
+		String user = "UO283681";
+		String pass = "caster12";
+		int i = 0;
+		int[] rows;
+		Statement s = null;
+		try {
+			long t1 = System.currentTimeMillis();
+			c = DriverManager.getConnection(
+					"jdbc:oracle:thin:@156.35.94.98:1521:DESA19", user, pass);
+			s = c.createStatement();
+
+			for (i = 0; i < 1000; i++)
+				s.addBatch(
+						"update tinvoices set amount = amount + 1 where id = "
+								+ i);
+			rows = s.executeBatch();
+			long t2 = System.currentTimeMillis();
+			System.out.println("TIME FOR STATEMENT IS: " + (t2 - t1));
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (s != null)
+				s.close();
+			c.close();
+		}
+		PreparedStatement p = null;
+		try {
+			long t1 = System.currentTimeMillis();
+			c = DriverManager.getConnection(
+					"jdbc:oracle:thin:@156.35.94.98:1521:DESA19", user, pass);
+			p = c.prepareStatement(
+					"update tinvoices set amount = amount + 1 where id = ?");
+			p.setInt(1, i);
+
+			for (i = 0; i < 1000; i++)
+				p.addBatch();
+			rows = p.executeBatch();
+			long t2 = System.currentTimeMillis();
+			System.out.println("TIME FOR PREPARED STATEMENT IS: " + (t2 - t1));
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (p != null)
+				p.close();
+			c.close();
+		}
+	}
+
+	public static void hsqldbEx2() throws SQLException {
+		System.out.println(
+				"---------------------HSDQLDB exercise 2----------------------");
+		Connection c = null;
+		String user = "sa";
+		String pass = "";
+		ResultSet r = null;
+		int i = 0;
+		PreparedStatement p = null;
+		try {
+			long t1 = System.currentTimeMillis();
+			c = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost",
+					user, pass);
+			p = c.prepareStatement("select count(*) from tinvoices");
+
+			for (i = 0; i < 100; i++)
+				p.executeQuery();
+			long t2 = System.currentTimeMillis();
+			System.out.println("TIME COUNTING CONNECTION IS: " + (t2 - t1));
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (r != null)
+				r.close();
+			if (p != null)
+				p.close();
+			c.close();
+		}
+
+		try {
+
+			c = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost",
+					user, pass);
+			long t1 = System.currentTimeMillis();
+			p = c.prepareStatement("select count(*) from tinvoices");
+
+			for (i = 0; i < 100; i++)
+				p.executeQuery();
+			long t2 = System.currentTimeMillis();
+			System.out.println("TIME NOT COUNTING CONNECTION IS: " + (t2 - t1));
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (r != null)
+				r.close();
+			if (p != null)
+				p.close();
+			c.close();
+		}
+	}
+
+	public static void hsqldbEx3a() throws SQLException {
+		System.out.println(
+				"---------------------HSDQLDB exercise 3 a----------------------");
+		Connection c = null;
+		String user = "sa";
+		String pass = "";
+		ResultSet r = null;
+		int i = 0;
+		PreparedStatement p = null;
+		try {
+			long t1 = System.currentTimeMillis();
+			c = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost",
+					user, pass);
+			p = c.prepareStatement("select count(*) from tinvoices");
+
+			for (i = 0; i < 100; i++)
+				p.executeQuery();
+			long t2 = System.currentTimeMillis();
+			System.out.println("TIME COUNTING CONNECTION IS: " + (t2 - t1));
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (r != null)
+				r.close();
+			if (p != null)
+				p.close();
+			c.close();
+		}
+	}
+
+	public static void oracleEx3a() throws SQLException {
+		System.out.println(
+				"---------------------Oracle exercise 3 a----------------------");
+		Connection c = null;
+		String user = "UO283681";
+		String pass = "caster12";
+		ResultSet r = null;
+		int i = 0;
+		PreparedStatement p = null;
+		try {
+			long t1 = System.currentTimeMillis();
+			c = DriverManager.getConnection(
+					"jdbc:oracle:thin:@156.35.94.98:1521:DESA19", user, pass);
+			p = c.prepareStatement("select count(*) from tinvoices");
+
+			for (i = 0; i < 100; i++)
+				p.executeQuery();
+			long t2 = System.currentTimeMillis();
+			System.out.println("TIME COUNTING CONNECTION IS: " + (t2 - t1));
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (r != null)
+				r.close();
+			if (p != null)
+				p.close();
+			c.close();
+		}
+	}
+}
